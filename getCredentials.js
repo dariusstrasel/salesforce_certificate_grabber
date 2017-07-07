@@ -1,7 +1,8 @@
-const fs = require('fs')
-const csv = require("fast-csv")
+const fs = require('fs');
+const csv = require("fast-csv");
 const jsforce = require('jsforce');
-const sfdc = require("./salesforce")
+const sfdc = require("./salesforce");
+const prompt = require('prompt');
 
 var schema = {
     properties: {
