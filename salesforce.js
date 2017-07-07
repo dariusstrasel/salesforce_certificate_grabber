@@ -9,7 +9,13 @@ const mkdirp = require('mkdirp');
 // 3. Query metadata fields for each returned certificate.
 // 4. Return shortened fields to STDOUT
 
-
+/**
+ * Gets Certificate metadata (and .crt files) from Salesforce with provided username and password.
+ *
+ * @param {string} username - String representing a Salesforce's username.
+ * @param {string} password - String representing a Salesforce's password
+ * @return {null} None
+ */
 function getSalesforceCertificates(username, password) {
 
   var conn = new jsforce.Connection();
