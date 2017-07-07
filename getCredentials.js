@@ -6,15 +6,10 @@ const prompt = require('prompt');
 
 var schema = {
     properties: {
-        username: {
-            description: 'Enter your username:',
+        tool: {
+            description: 'Enter your tool: Salesforce (C)ertificates or Salesforce (S)SO.',
             required: true
         },
-        password: {
-            description: 'Enter your password:',
-            hidden: true,
-            replace: '*',
-        }
     }
 };
 
@@ -27,19 +22,34 @@ function promptUser() {
             console.log(error);
         }
         if (result) {
-            console.log("commmand line input recieved:", result.username, result.password);
+            tool_map = {
+                'c': 'certificate',
+                's': 'sso'
+            }
+            selected_tool = tool_map[result.tool.toLowerCase()]
+            if (selected_tool === undefined) {
+                console.log(`Command line input ${result.tool} was unrecognized. Please try again.`)
+                return promptUser();
+            } else {
+                console.log(`Recognized input, getting ${selected_tool} data.`)
+                return selected_tool;
+            }
         }
     });
 }
 
-function getCSV(fileName) {
+function getCSV(fileName, tool) {
+    tool_map = {
+        'certificate': sfdc.getSalesforceCertificates,
+        'sso': sfdc.getSalesforceSSO
+    }
+    selected_tool = tool_map[tool];
     fs.createReadStream(fileName)
         .pipe(csv())
         .on("data", function (data) {
             username = data[0]
             password = data[1]
-            //sfdc.getSalesforceCertificates(username, password)
-            sfdc.getSalesforceSSO(username, password)
+            selected_tool(username, password)
         })
         .on("end", function () {
             console.log("done");
@@ -49,7 +59,8 @@ function getCSV(fileName) {
 
 
 function main() {
-    getCSV('secret.csv')
+    tool = promptUser();
+    return getCSV('secret.csv', tool)
 }
 
 main();
