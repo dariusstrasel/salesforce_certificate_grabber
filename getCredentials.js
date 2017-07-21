@@ -15,7 +15,7 @@ var schema = {
 
 
 
-function promptUser() {
+function promptUser(callback) {
     prompt.start();
     prompt.get(schema, function (error, result) {
         if (error) {
@@ -32,9 +32,11 @@ function promptUser() {
                 return promptUser();
             } else {
                 console.log(`Recognized input, getting ${selected_tool} data.`)
-                return selected_tool;
+                callback('secret.csv', selected_tool)
+                //return selected_tool;
             }
         }
+
     });
 }
 
@@ -44,11 +46,13 @@ function getCSV(fileName, tool) {
         'sso': sfdc.getSalesforceSSO
     }
     selected_tool = tool_map[tool];
+    console.log(selected_tool);
     fs.createReadStream(fileName)
         .pipe(csv())
         .on("data", function (data) {
             username = data[0]
             password = data[1]
+            // Selected tool is evaluated from tool_map
             selected_tool(username, password)
         })
         .on("end", function () {
@@ -59,8 +63,8 @@ function getCSV(fileName, tool) {
 
 
 function main() {
-    tool = promptUser();
-    return getCSV('secret.csv', tool)
+    promptUser(getCSV);
+    //return getCSV('secret.csv', tool)
 }
 
 main();
