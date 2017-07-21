@@ -5,9 +5,10 @@ const mkdirp = require('mkdirp');
 
 // Here is the process:
 // 1. Log into the org.
-// 2. List the certificate metadata.
-// 3. Query metadata fields for each returned certificate.
-// 4. Return shortened fields to STDOUT
+// 2. List the desired metadata as objects.
+// 3. Query metadata fields for each returned object.
+// 4. Return result to STDOUT
+// 5. STDOUT is captured via a filestream.
 
 /**
  * Gets Certificate metadata (and .crt files) from Salesforce with provided username and password.

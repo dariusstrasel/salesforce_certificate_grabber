@@ -31,9 +31,11 @@ function promptUser(callback) {
                 'c': 'certificate',
                 's': 'sso'
             }
+            // Takes user input and evaluates according to tool_map
             selected_tool = tool_map[result.tool.toLowerCase()]
             if (selected_tool === undefined) {
                 console.log(`Command line input ${result.tool} was unrecognized. Please try again.`)
+                // Value was undefined, prompt user again for input.
                 return promptUser();
             } else {
                 console.log(`Recognized input, getting ${selected_tool} data.`)
