@@ -1,13 +1,14 @@
 {
   "name": "salesforce_certificate_grabber",
   "version": "0.0.1",
-  "description": "A node utility for grabbing certificate data from Salesforce orgs.",
+  "description": "A node utility for grabbing certificate/SSO data from Salesforce orgs.",
   "main": "getCredentials.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "salesforce", "node.js"
+    "salesforce",
+    "node.js"
   ],
   "author": "Darius Strasel (strasel.darius@gmail.com)",
   "license": "MIT",
