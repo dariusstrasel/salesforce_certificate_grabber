@@ -1,3 +1,11 @@
+# Project Specific files
+sso/
+certs/
+.vscode
+node_modules/
+python/
+secret.csv
+
 # Logs
 logs
 *.log
