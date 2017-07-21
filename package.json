@@ -1,14 +1,17 @@
 {
   "name": "salesforce_certificate_grabber",
-  "version": "0.0.1",
-  "description": "A node utility for grabbing certificate/SSO data from Salesforce orgs.",
+  "version": "0.1.0",
+  "description": "A CLI tool made via node.js that downloads certificates or sso metadata for supplied Salesforce.com credentials.",
   "main": "getCredentials.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "salesforce",
-    "node.js"
+    "node.js",
+    "single-sign-on",
+    "sso",
+    "certificate"
   ],
   "author": "Darius Strasel (strasel.darius@gmail.com)",
   "license": "MIT",
@@ -16,7 +19,6 @@
     "fast-csv": "^2.4.0",
     "jsforce": "^1.8.0",
     "mkdirp": "^0.5.1",
-    "msnodesqlv8": "^0.2.17",
     "prompt": "^1.0.0"
   },
   "devDependencies": {},
