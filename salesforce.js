@@ -10,6 +10,8 @@ const mkdirp = require('mkdirp');
 // 4. Return result to STDOUT
 // 5. STDOUT is captured via a filestream.
 
+// TODO: Refactor READ and LIST metadata functions to be DRY.
+
 /**
  * Gets Certificate metadata (and .crt files) from Salesforce with provided username and password.
  *
@@ -23,39 +25,43 @@ function getSalesforceCertificates(username, password) {
 
   conn.login(username, password, function (err, res) {
     if (err) {
-      console.log("Error raised for:", username)
-      console.error('err', err);
+      handleError(err, username)
     }
 
     console.log("Logging in...")
 
     var types = [{ type: 'Certificate', folder: null }];
+    var fields = ['fullName','caSigned', 'expirationDate']
     listMetaDataObjects(types, conn)
   });
 }
 
 function listMetaDataObjects(types, conn) {
+  var type = types[0].type // Pull type property from input types array.
   conn.metadata.list(types, '39.0', function (err, metadata) {
     if (err) {
       handleError(err, username)
     }
     if (metadata) {
-      console.log("Found", metadata.length, "certificates:");
+      console.log("Found", metadata.length, type, ":");
       var fullNames = []; // Create array of results.
       metadata.forEach(function (meta) {
         //console.log(meta);
         fullNames.push(meta.fullName)
       })
+    } else {
+      console.log("No metadata was returned from conn.metadata.list method().")
+      return false;
     }
     if (fullNames) {
-      readMetaData(fullNames, conn);
+      readMetaData(fullNames, conn, type);
     }
   });
 }
 
-function readMetaData(fullNames, conn) {
+function readMetaData(fullNames, conn, type) {
   if (fullNames) {
-    conn.metadata.read('Certificate', fullNames, function (err, metadata) {
+    conn.metadata.read(type, fullNames, function (err, metadata) {
       if (err) {
         handleError(err, username)
       }
