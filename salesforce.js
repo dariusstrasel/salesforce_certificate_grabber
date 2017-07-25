@@ -30,43 +30,49 @@ function getSalesforceCertificates(username, password) {
     console.log("Logging in...")
 
     var types = [{ type: 'Certificate', folder: null }];
-    listMetaDataObjects(types)
+    listMetaDataObjects(types, conn)
   });
 }
 
-function listMetaDataObjects(types) {
-    conn.metadata.list(types, '39.0', function (err, metadata) {
+function listMetaDataObjects(types, conn) {
+  conn.metadata.list(types, '39.0', function (err, metadata) {
+    if (err) {
+      handleError(err, username)
+    }
+    if (metadata) {
+      console.log("Found", metadata.length, "certificates:");
+      var fullNames = []; // Create array of results.
+      metadata.forEach(function (meta) {
+        //console.log(meta);
+        fullNames.push(meta.fullName)
+      })
+    }
+    if (fullNames) {
+      readMetaData(fullNames, conn);
+    }
+  });
+}
+
+function readMetaData(fullNames, conn) {
+  if (fullNames) {
+    conn.metadata.read('Certificate', fullNames, function (err, metadata) {
       if (err) {
-        console.log("Error raised for:", username)
-        console.error('err', err);
+        handleError(err, username)
       }
-      if (metadata) {
-        console.log("Found", metadata.length, "certificates:");
-        var fullNames = [];
-        metadata.forEach(function (meta) {
-          //console.log(meta);
-          fullNames.push(meta.fullName)
-        })
-      }
-      if (fullNames) {
-        conn.metadata.read('Certificate', fullNames, function (err, metadata) {
-          if (err) {
-            console.log("Error raised for:", username)
-            console.error('err', err);
-          }
-          //console.log("Getting metadata...")
-          var logger = fs.createWriteStream('log.txt', {
-            flags: 'a' // 'a' means appending (old data will be preserved)
-          })
-          for (var i = 0; i < metadata.length; i++) {
-            var meta = metadata[i];
-            console.log({ 'fullName': meta.fullName, 'caSigned': meta.caSigned, 'expirationDate': meta.expirationDate });
-            writeCert(meta.fullName, meta.content)
-            logger.write(`${username}, ${meta.fullName}, ${meta.caSigned}, ${meta.expirationDate}` + os.EOL)
-          }
-        });
+      //console.log("Getting metadata...")
+      var logger = fs.createWriteStream('log.txt', {
+        flags: 'a' // 'a' means appending (old data will be preserved)
+      })
+      for (var i = 0; i < metadata.length; i++) {
+        var meta = metadata[i];
+        console.log({ 'fullName': meta.fullName, 'caSigned': meta.caSigned, 'expirationDate': meta.expirationDate });
+        writeCert(meta.fullName, meta.content)
+        logger.write(`${username}, ${meta.fullName}, ${meta.caSigned}, ${meta.expirationDate}` + os.EOL)
       }
     });
+  } else {
+    console.log("A fullNames object was not passed in.")
+  }
 }
 
 /**
