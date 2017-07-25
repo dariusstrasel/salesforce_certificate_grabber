@@ -30,6 +30,11 @@ function getSalesforceCertificates(username, password) {
     console.log("Logging in...")
 
     var types = [{ type: 'Certificate', folder: null }];
+    listMetaDataObjects(types)
+  });
+}
+
+function listMetaDataObjects(types) {
     conn.metadata.list(types, '39.0', function (err, metadata) {
       if (err) {
         console.log("Error raised for:", username)
@@ -62,14 +67,13 @@ function getSalesforceCertificates(username, password) {
         });
       }
     });
-  });
 }
 
 /**
  * Gets SamlSSOConfig metadata from Salesforce with provided username and password.
  *
  * @param {string} username - String representing a Salesforce's user instance.
- * @param { type: 'TypeConfig', folder: null } types - The content which should be written to file.
+ * @param {string} password - String representing a Salesforce's user instance's password.
  * @return {null} None
  */
 function getSalesforceSSO(username, password) {
