@@ -93,7 +93,7 @@ function getSalesforceSSO(username, password) {
  * Gets all the objects from Salesforce which match the passed in 'types' object.
  *
  * @param {jsforce.Connection()} connection - Connection object from JSForce for Salesforce session. Should be pre-authenticated thru connection.login.
- * @param { type: 'TypeConfig', folder: null } types - The content which should be written to file.
+ * @param { type: 'TypeConfig', folder: null } types.type - The meta-data type to pull.
  * @return {null} None
  */
 function getMetadataObjects(connection, types, username) {
@@ -107,8 +107,8 @@ function getMetadataObjects(connection, types, username) {
       var fullNames = [];
 
       // Salesforce returns a single object if one result, or an array if more than one.
-      var logString = function (one, two, three) {
-        return `Found ${one} SSOconfig(s) for ${two}: ${three}`
+      var logString = function (count, username, metaDataObject) {
+        return `Found ${count} SSOconfig(s) for ${username}: ${metaDataObject}`
       }
 
       if (metadata.constructor === Array) {
