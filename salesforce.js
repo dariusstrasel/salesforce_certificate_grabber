@@ -31,7 +31,7 @@ function getSalesforceCertificates(username, password) {
     console.log("Logging in...")
 
     var types = [{ type: 'Certificate', folder: null }];
-    var fields = ['fullName','caSigned', 'expirationDate']
+    var fields = ['fullName', 'caSigned', 'expirationDate']
     listMetaDataObjects(types, conn)
   });
 }
@@ -144,7 +144,6 @@ function getMetadataObjects(connection, types, username) {
   });
 }
 
-
 /**
  * Writes a SSO config to json from SFDC SSO metadata.
  *
@@ -164,6 +163,44 @@ function readMetaDataFields(connection, type, fullNames, username) {
       var meta = metadata[i];
       writeSSO(`${meta.fullName}_${username.split("@")[0]}`, meta)
     }
+  });
+}
+
+function postMetadata(username, password) {
+
+  
+  var certificateName = function(){
+    clientName = username.split("@")[0]
+    return `${clientName}_SSO_Signing_Certificate`
+  }
+
+  var metadata = [{
+    fullName: certificateName(),// Must be the type of target POST object.
+    caSigned: 'false',
+    encryptedWithPlatformEncryption: 'false',
+    keySize: '4096',
+    masterLabel: certificateName()
+  }];
+
+
+  var conn = new jsforce.Connection();
+  // Create Salesforce Connection
+  conn.login(username, password, function (err, res) {
+    if (err) {
+      handleError(err, username)
+    }
+
+    console.log("Logging in...")
+
+    conn.metadata.create('Certificate', metadata, function (err, results) {
+      console.log(`Posting ${metadata} to ${username}`)
+      if (err) { handleError(err, "user@example.com"); }
+      for (var i = 0; i < results.length; i++) {
+        var result = results[i];
+        console.log('success ? : ' + result.success);
+        console.log('fullName : ' + result.fullName);
+      }
+    });
   });
 }
 
@@ -246,5 +283,6 @@ function decodeBase64(base64string) {
 
 module.exports = {
   getSalesforceCertificates: getSalesforceCertificates,
-  getSalesforceSSO: getSalesforceSSO
+  getSalesforceSSO: getSalesforceSSO,
+  postMetadata: postMetadata
 }
