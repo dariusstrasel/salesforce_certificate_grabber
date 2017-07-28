@@ -167,9 +167,9 @@ function readMetaDataFields(connection, type, fullNames, username) {
 }
 
 function postMetadata(username, password) {
+// NOT PRODUCTION READY
 
-  
-  var certificateName = function(){
+  var certificateName = function () {
     clientName = username.split("@")[0]
     return `${clientName}_SSO_Signing_Certificate`
   }
@@ -201,6 +201,47 @@ function postMetadata(username, password) {
         console.log('fullName : ' + result.fullName);
       }
     });
+  });
+}
+
+function deleteMetadata(username, password) {
+// NOT PRODUCTION READY
+
+  var certificateName = function () {
+    clientName = username.split("@")[0]
+    return `${clientName}_SSO_Signing_Certificate`
+  }
+
+  var metadata = [{
+    fullName: certificateName(),// Must be the type of target POST object.
+    caSigned: 'false',
+    encryptedWithPlatformEncryption: 'false',
+    keySize: '4096',
+    masterLabel: certificateName()
+  }];
+
+
+  var conn = new jsforce.Connection();
+  // Create Salesforce Connection
+  conn.login(username, password, function (err, res) {
+    if (err) {
+      handleError(err, username)
+    }
+
+    console.log("Logging in...")
+
+    var fullNames = ['Certificate']; // Unique Name
+
+    conn.metadata.delete('Certificate', fullNames, function (err, results) {
+      console.log(`Deleting ${fullNames} from ${username}`)
+      if (err) { handleError(err, username) }
+      for (var i = 0; i < results.length; i++) {
+        var result = results[i];
+        console.log('success ? : ' + result.success);
+        console.log('fullName : ' + result.fullName);
+      }
+    });
+
   });
 }
 
@@ -284,5 +325,6 @@ function decodeBase64(base64string) {
 module.exports = {
   getSalesforceCertificates: getSalesforceCertificates,
   getSalesforceSSO: getSalesforceSSO,
-  postMetadata: postMetadata
+  postMetadata: postMetadata,
+  deleteMetadata:deleteMetadata
 }
