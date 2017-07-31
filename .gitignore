@@ -5,6 +5,8 @@ certs/
 node_modules/
 python/
 secret.csv
+log.txt
+sso_log.txt
 
 # Logs
 logs
