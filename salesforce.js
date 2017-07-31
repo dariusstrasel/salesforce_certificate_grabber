@@ -32,11 +32,11 @@ function getSalesforceCertificates(username, password) {
 
     var types = [{ type: 'Certificate', folder: null }];
     var fields = ['fullName', 'caSigned', 'expirationDate']
-    listMetaDataObjects(types, conn)
+    listMetaDataObjects(types, conn, username)
   });
 }
 
-function listMetaDataObjects(types, conn) {
+function listMetaDataObjects(types, conn, username) {
   var type = types[0].type // Pull type property from input types array.
   conn.metadata.list(types, '39.0', function (err, metadata) {
     if (err) {
@@ -54,12 +54,12 @@ function listMetaDataObjects(types, conn) {
       return false;
     }
     if (fullNames) {
-      readMetaData(fullNames, conn, type);
+      readMetaData(fullNames, conn, type, username);
     }
   });
 }
 
-function readMetaData(fullNames, conn, type) {
+function readMetaData(fullNames, conn, type, username) {
   if (fullNames) {
     conn.metadata.read(type, fullNames, function (err, metadata) {
       if (err) {
@@ -71,9 +71,20 @@ function readMetaData(fullNames, conn, type) {
       })
       for (var i = 0; i < metadata.length; i++) {
         var meta = metadata[i];
-        console.log({ 'fullName': meta.fullName, 'caSigned': meta.caSigned, 'expirationDate': meta.expirationDate });
+        var certificateInfo = {
+          'usename': username,
+          'fullName': meta.fullName,
+          'caSigned': meta.caSigned,
+          'expirationDate': meta.expirationDate,
+          'expired': new Date(meta.expirationDate) < Date.now()
+        }
+        console.log(`${username}: ${meta.fullName}: Expires: ${meta.expirationDate} Expired: ${certificateInfo['expired']}`);
+
         writeCert(meta.fullName, meta.content)
-        logger.write(`${username}, ${meta.fullName}, ${meta.caSigned}, ${meta.expirationDate}` + os.EOL)
+
+        logger.write(`${username}, ${meta.fullName}, ${meta.caSigned}, ${meta.expirationDate}, ${certificateInfo['expired']}` + os.EOL)
+
+        // logger.write(`${username}, ${meta.fullName}, ${meta.caSigned}, ${meta.expirationDate}` + os.EOL)
       }
     });
   } else {
@@ -158,16 +169,19 @@ function readMetaDataFields(connection, type, fullNames, username) {
       return handleError(err, username);
     }
     //console.log("Getting metadata...")
-
+    var logger = fs.createWriteStream('sso_log.txt', {
+      flags: 'a' // 'a' means appending (old data will be preserved)
+    })
     for (var i = 0; i < metadata.length; i++) {
       var meta = metadata[i];
       writeSSO(`${meta.fullName}_${username.split("@")[0]}`, meta)
+      logger.write(`${username}, ${meta.fullName}, ${meta["requestSignatureMethod"]}` + os.EOL)
     }
   });
 }
 
 function postMetadata(username, password) {
-// NOT PRODUCTION READY
+  // NOT PRODUCTION READY
 
   var certificateName = function () {
     clientName = username.split("@")[0]
@@ -205,7 +219,7 @@ function postMetadata(username, password) {
 }
 
 function deleteMetadata(username, password) {
-// NOT PRODUCTION READY
+  // NOT PRODUCTION READY
 
   var certificateName = function () {
     clientName = username.split("@")[0]
@@ -326,5 +340,5 @@ module.exports = {
   getSalesforceCertificates: getSalesforceCertificates,
   getSalesforceSSO: getSalesforceSSO,
   postMetadata: postMetadata,
-  deleteMetadata:deleteMetadata
+  deleteMetadata: deleteMetadata
 }
