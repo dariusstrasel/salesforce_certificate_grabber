@@ -29,7 +29,9 @@ function promptUser(callback) {
         if (result) {
             tool_map = {
                 'c': 'certificate',
-                's': 'sso'
+                's': 'sso',
+                'p': 'post_metadata',
+                'd': 'delete_metadata'
             }
             // Takes user input and evaluates according to tool_map
             selected_tool = tool_map[result.tool.toLowerCase()]
@@ -59,7 +61,9 @@ function getCSV(fileName, tool) {
     // Open the targetted csv as a text stream.
     tool_map = {
         'certificate': sfdc.getSalesforceCertificates,
-        'sso': sfdc.getSalesforceSSO
+        'sso': sfdc.getSalesforceSSO,
+        'post_metadata': sfdc.postMetadata, // NOT PRODUCTION READY
+        'delete_metadata': sfdc.deleteMetadata
     }
     selected_tool = tool_map[tool];
     console.log(selected_tool);
