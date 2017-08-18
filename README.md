@@ -18,3 +18,6 @@ node getCredentials.js
 ```
 
 6. Success!
+
+# Requirements:
+- One csv file with username and password.
